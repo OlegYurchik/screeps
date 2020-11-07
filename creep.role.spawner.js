@@ -19,12 +19,12 @@ let creepRoleSpawner = {
             creepRoleUtils.doTransfer(creep, target, this.pathColor, this.reusePath)
         }
     },
-    
+
     choiceSource: function(creep) {
         let sources = creep.room.find(FIND_SOURCES)
         return sources[0]
     },
-    
+
     choiceTarget: function(creep) {
         let structures = creep.room.find(FIND_STRUCTURES, {
             filter: (structure) => {

@@ -29,7 +29,7 @@ let creepRoleUpgrader = {
             creepRoleUtils.doHarvest(creep, source, this.pathColor, this.reusePath)
         }
     },
-    
+
     choiceSource: function(creep) {
         let sources = creep.room.find(FIND_SOURCES)
         return sources[0]

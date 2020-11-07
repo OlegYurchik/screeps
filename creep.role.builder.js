@@ -17,25 +17,24 @@ let creepRoleBuilder = {
 
         if (creep.memory.state == "build" && creep.store[RESOURCE_ENERGY] == 0) {
             creep.memory.state = "harvest"
-            
         } else if (creep.memory.state == "harvest" && creep.store.getFreeCapacity() == 0) {
             creep.memory.state = "build"
         }
-        
+
         if (creep.memory.state == "build") {
-            let target = creep.memory.forceTarget ? creep.memory.forceTarget : this.choiceTarget(creep);
+            let target = creep.memory.forceTarget ? creep.memory.forceTarget : this.choiceTarget(creep)
             creepRoleUtils.doBuild(creep, target, this.pathColor, this.reusePath)
         } else if (creep.memory.state == "harvest") {
             let source = creep.memory.forceSource ? creep.memory.forceSource : this.choiceSource(creep)
             creepRoleUtils.doHarvest(creep, source, this.pathColor, this.reusePath)
         }
     },
-    
+
     choiceSource: function(creep) {
         let sources = creep.room.find(FIND_SOURCES)
         return sources[0]
     },
-    
+
     choiceTarget: function(creep) {
         let sites = creep.room.find(FIND_CONSTRUCTION_SITES)
         return sites[0]
