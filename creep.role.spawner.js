@@ -1,9 +1,17 @@
-let creepRoleUtils = require("creep.role.utils")
+const creepRoleUtils = require("creep.role.utils")
+const stateHarvest = 0
+const stateTransfer = 1
+
+/*
+* Spawner creep fields *
+* state: int
+*/
 
 let creepRoleSpawner = {
     name: "spawner",
     pathColor: "#ffff00",
     reusePath: 100,
+    states: [stateHarvest, stateTransfer],
     body: {
         [WORK]: 1,
         [CARRY]: 1,
@@ -11,11 +19,21 @@ let creepRoleSpawner = {
     },
 
     loop: function(creep) {
-        if (creep.memory.forceHarvest || creep.store[RESOURCE_ENERGY] == 0) {
-            let source = creep.memory.forceSource ? creep.memory.forceSource : this.choiceSource(creep)
+        if (!(creep.memory.roleData.state in this.states)) {
+            creep.memory.roleData.state = creep.store[RESOURCE_ENERGY] < creep.store.getCapacity() / 2 ? stateHarvest : stateTransfer
+        }
+
+        if (creep.memory.roleData.state == stateTransfer && creep.store[RESOURCE_ENERGY] == 0) {
+            creep.memory.roleData.state = stateHarvest
+        } else if (creep.memory.roleData.state == stateHarvest && creep.store.getFreeCapacity() == 0) {
+            creep.memory.roleData.state = stateTransfer
+        }
+
+        if (creep.memory.roleData.state == stateHarvest) {
+            let source = this.choiceSource(creep)
             creepRoleUtils.doHarvest(creep, source, this.pathColor, this.reusePath)      
-        } else {
-            let target = creep.memory.forceTarget ? creep.memory.forceTarget : this.choiceTarget(creep)
+        } else if (creep.memory.roleData.state == stateTransfer) {
+            let target = this.choiceTarget(creep)
             creepRoleUtils.doTransfer(creep, target, this.pathColor, this.reusePath)
         }
     },

@@ -1,8 +1,9 @@
-let creepRoleBuilder = require("creep.role.builder")
-let creepRoleSpawner = require("creep.role.spawner")
-let creepRoleUpgrader = require("creep.role.upgrader")
+const creepRoleBuilder = require("creep.role.builder")
+const creepRoleSpawner = require("creep.role.spawner")
+const creepRoleUpgrader = require("creep.role.upgrader")
 
 let creepRoles = {
+    default: creepRoleSpawner,
     [creepRoleBuilder.name]: creepRoleBuilder,
     [creepRoleSpawner.name]: creepRoleSpawner,
     [creepRoleUpgrader.name]: creepRoleUpgrader,

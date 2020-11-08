@@ -1,9 +1,17 @@
-let creepRoleUtils = require("creep.role.utils")
+const creepRoleUtils = require("creep.role.utils")
+const stateHarvest = 0
+const stateUpgrade = 1
+
+/*
+* Upgrader creep fields *
+* state: int
+*/
 
 let creepRoleUpgrader = {
     name: "upgrader",
     pathColor: "#ffa500",
     reusePath: 100,
+    states: [stateHarvest, stateUpgrade],
     body: {
         [WORK]: 1,
         [CARRY]: 1,
@@ -11,21 +19,21 @@ let creepRoleUpgrader = {
     },
 
     loop: function(creep) {
-        if (!creep.memory.state) {
-            creep.memory.state = creep.store[RESOURCE_ENERGY] < creep.store.getCapacity() / 2 ? "harvest" : "upgrade"
+        if (!(creep.memory.roleData.state in this.states)) {
+            creep.memory.roleData.state = creep.store[RESOURCE_ENERGY] < creep.store.getCapacity() / 2 ? stateHarvest : stateUpgrade
         }
         
-        if (creep.memory.state == "upgrade" && creep.store[RESOURCE_ENERGY] == 0) {
-            creep.memory.state = "harvest"
+        if (creep.memory.roleData.state == stateUpgrade && creep.store[RESOURCE_ENERGY] == 0) {
+            creep.memory.roleData.state = stateHarvest
             
-        } else if (creep.memory.state == "harvest" && creep.store.getFreeCapacity() == 0) {
-            creep.memory.state = "upgrade"
+        } else if (creep.memory.roleData.state == stateHarvest && creep.store.getFreeCapacity() == 0) {
+            creep.memory.roleData.state = stateUpgrade
         }
 
-        if (creep.memory.state == "upgrade") {
+        if (creep.memory.roleData.state == stateUpgrade) {
             creepRoleUtils.doUpgrade(creep, this.pathColor, this.reusePath)
-        } else if (creep.memory.state == "harvest") {
-            let source = creep.memory.forceSource ? creep.memory.forceSource : this.choiceSource(creep)
+        } else if (creep.memory.roleData.state == stateHarvest) {
+            let source = this.choiceSource(creep)
             creepRoleUtils.doHarvest(creep, source, this.pathColor, this.reusePath)
         }
     },

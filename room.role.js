@@ -1,6 +1,8 @@
-let roomRoleDefault = require("room.role.default")
+const roomRolePeace = require("room.role.peace")
+
 let roomRoles = {
-    [roomRoleDefault.name]: roomRoleDefault,
+    default: roomRolePeace,
+    [roomRolePeace.name]: roomRolePeace,
 }
 
 module.exports = roomRoles
