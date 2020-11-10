@@ -50,12 +50,12 @@ let creepRoleBuilder = {
         } else if (creep.memory.roleData.state != stateHarvest &&
                    creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0 && source &&
                    source.energy > 0 && (creep.store[RESOURCE_ENERGY] == 0 ||
-                   pathToSource.length <= pathToTarget.length)) {
+                   (pathToSource && pathToTarget && pathToSource.length <= pathToTarget.length))) {
             creep.memory.roleData.state = stateHarvest
         } else if (creep.memory.roleData.state != stateBuild &&
                    creep.store[RESOURCE_ENERGY] > 0 && target &&
                    (creep.store.getFreeCapacity(RESOURCE_ENERGY) == 0 ||
-                   pathToTarget.length <= pathToSource.length)) {
+                   (pathToSource && pathToTarget && pathToTarget.length <= pathToSource.length))) {
             creep.memory.roleData.state = stateBuild
         }
 
