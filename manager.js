@@ -12,7 +12,7 @@ let manager = {
     },
 
     loop: function() {
-        start = performance.now()
+        let start = performance.now()
         for (let roomName in Game.rooms) {
             roomManager.loop(Game.rooms[roomName])
         }
@@ -24,7 +24,7 @@ let manager = {
         for (let creepName in Game.creeps) {
             creepManager.loop(Game.creeps[creepName])
         }
-        end = performance.now()
+        let end = performance.now()
         console.log("Iteration time:", start - end, "ms")
     },
 }
