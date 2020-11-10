@@ -27,10 +27,10 @@ let creepRoleUpgrader = {
     loop: function(creep) {
         // Get source and target, calculate paths
         let source = this.chooseSource(creep)
-        let routeToSource
-        let routeToTarget = PathFinder.search(creep.room.controller)
+        let pathToSource
+        let pathToTarget = creep.room.findPath(creep.pos, creep.room.controller.pos)
         if (source) {
-            routeToSource = PathFinder.search(source.pos)
+            pathToSource = creep.room.findPath(creep.pos, source.pos)
         }
 
         // Set default state if state is undefined
@@ -40,14 +40,18 @@ let creepRoleUpgrader = {
         
         // Change state if conditions is true
         if (creep.memory.roleData.forceRest || (creep.memory.roleData.state != stateRest &&
-            (!source || source.energy == 0))) {
+            (!source || source.energy == 0 || creep.store.getFreeCapacity(RESOURCE_ENERGY) == 0)) &&
+            creep.store[RESOURCE_ENERGY] == 0) {
            creep.memory.roleData.state = stateRest
         } else if (creep.memory.roleData.state != stateHarvest &&
                    creep.store.getFreeCapacity() > 0 && source && source.energy > 0 &&
-                   routeToSource.cost <= routeToTarget.cost) {
+                   (creep.store[RESOURCE_ENERGY] == 0 ||
+                    pathToSource.length <= pathToTarget.length)) {
             creep.memory.roleData.state = stateHarvest
-        } else if (creep.memory.roleData.state != stateBuild &&
-                   creep.store[RESOURCE_ENERGY] > 0 && routeToTarget.cost <= routeToSource.cost) {
+        } else if (creep.memory.roleData.state != stateUpgrade &&
+                   creep.store[RESOURCE_ENERGY] > 0 &&
+                   (creep.store.getFreeCapacity(RESOURCE_ENERGY) == 0 ||
+                   pathToTarget.length <= pathToSource.length)) {
             creep.memory.roleData.state = stateUpgrade
         }
 

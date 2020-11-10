@@ -50,7 +50,10 @@ let doRest = function(creep, pos, reusePath) {
     if (creep.pos != pos) {
         creep.say("🏠")
         creep.memory.target = pos
-        creep.moveTo(pos, {visualizePathStyle: {stroke: "#ffffff"}, reusePath: reusePath})
+        creep.moveTo(pos, {
+            visualizePathStyle: {stroke: "#ffffff"},
+            reusePath: reusePath,
+        })
     }
 }
 

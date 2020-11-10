@@ -27,14 +27,14 @@ let roomRolePeace = {
             taskTypes[task.action].action(task, room)
         }
 
-        // let events = room.getEventLog(false)
+        let events = room.getEventLog(false)
         
-        // for (let index in events) {
-        //     let event = events[index]
-        //     if (event.event in this.eventHandlers) {
-        //         this[this.eventHandlers[event.event]](room, event)
-        //     }
-        // }
+        for (let index in events) {
+            let event = events[index]
+            if (event.event in this.eventHandlers) {
+                this[this.eventHandlers[event.event]](room, event)
+            }
+        }
     },
 }
 
