@@ -19,12 +19,13 @@ let calculateCreepTasks = function(room, creepRolePriority) {
         return []
     }
 
+    let creepsByRoles = getCreepsByRoles(room)
     // Calculate difference beetwen current and want creeps states
     let creepsDifference = {}
     for (let roleName in room.memory.targetState.creeps) {
         let current
-        if (roleName in room.memory.state.creepsByRoles) {
-            current = room.memory.state.creepsByRoles[roleName].length
+        if (roleName in creepsByRoles) {
+            current = creepsByRoles[roleName].length
         } else {
             current = 0
         }
