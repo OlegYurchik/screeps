@@ -1,3 +1,4 @@
+const creepRoles = require("creep.role")
 const roomRoleUtils = require("room.role.utils")
 const taskTypes = require("task")
 
@@ -13,9 +14,14 @@ let roomRolePeace = {
     eventHandlers: {
         
     },
+    creepRolePriority: {
+        [creepRoles.spawner]: 3,
+        [creepRoles.upgrader]: 2,
+        [creepRoles.builder]: 1,
+    },
 
     loop: function(room) {
-        let tasks = roomRoleUtils.calculateCreepTasks(room)
+        let tasks = roomRoleUtils.calculateCreepTasks(room, this.creepRolePriority)
         if (tasks.length > 0) {
             let task = tasks[0]
             taskTypes[task.action].action(task, room)

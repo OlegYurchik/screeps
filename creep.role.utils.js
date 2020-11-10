@@ -17,7 +17,7 @@ let doHarvest = function(creep, target, pathColor, reusePath) {
         creep.memory.target = target
         creep.moveTo(target, {
             visualizePathStyle: {stroke: pathColor},
-            resusePath: reusePath,
+            reusePath: reusePath,
         })
     }
 }
@@ -46,9 +46,18 @@ let doUpgrade = function(creep, pathColor, reusePath) {
     }
 }
 
+let doRest = function(creep, pos, reusePath) {
+    if (creep.pos != pos) {
+        creep.say("🏠")
+        creep.memory.target = pos
+        creep.moveTo(pos, {visualizePathStyle: {stroke: "#ffffff"}, reusePath: reusePath})
+    }
+}
+
 module.exports = {
     doBuild: doBuild,
     doHarvest: doHarvest,
+    doRest: doRest,
     doTransfer: doTransfer,
     doUpgrade: doUpgrade,
 }

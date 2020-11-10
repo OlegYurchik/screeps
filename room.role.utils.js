@@ -14,7 +14,7 @@ let getCreepsByRoles = function(room) {
     return creeps
 }
 
-let calculateCreepTasks = function(room) {
+let calculateCreepTasks = function(room, creepRolePriority) {
     if (!room.memory.targetState.creeps) {
         return []
     }
@@ -81,19 +81,19 @@ let calculateCreepTasks = function(room) {
     }
     
     // Sorting tasks
-    // if (creepRolePriority) {
-    //     changeCreepRoleTasks.sort(function(task1, task2) {
-    //         return creepRolePriority[task1.from] > creepRolePriority[task2.from] ||
-    //             (creepRolePriority[task1.from] == creepRolePriority[task2.from] &&
-    //             creepRolePriority[task1.to] > creepRolePriority[task2.to])
-    //     })
-    //     killCreepTasks.sort(function(task1, task2) {
-    //         return creepRolePriority[task1.to] > creepRolePriority[task2.to]
-    //     })
-    //     spawnCreepTasks.sort(function(task1, task2) {
-    //         return creepRolePriority[task1.to] > creepRolePriority[task2.to]
-    //     })
-    // }
+    if (creepRolePriority) {
+        changeCreepRoleTasks.sort(function(task1, task2) {
+            return creepRolePriority[task1.from] > creepRolePriority[task2.from] ||
+                (creepRolePriority[task1.from] == creepRolePriority[task2.from] &&
+                creepRolePriority[task1.to] > creepRolePriority[task2.to])
+        })
+        killCreepTasks.sort(function(task1, task2) {
+            return creepRolePriority[task1.to] > creepRolePriority[task2.to]
+        })
+        spawnCreepTasks.sort(function(task1, task2) {
+            return creepRolePriority[task1.to] > creepRolePriority[task2.to]
+        })
+    }
 
     return changeCreepRoleTasks.concat(killCreepTasks).concat(spawnCreepTasks)
 }
