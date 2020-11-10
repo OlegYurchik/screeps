@@ -12,7 +12,7 @@ const taskTypes = require("task")
 let roomRolePeace = {
     name: "peace",
     eventHandlers: {
-        
+        EVENT_OBJECT_DESTROYED: "objectDestroyedHandler",
     },
     creepRolePriority: {
         [creepRoles.spawner]: 3,
@@ -29,11 +29,17 @@ let roomRolePeace = {
 
         let events = room.getEventLog(false)
         
-        for (let index in events) {
-            let event = events[index]
+        for (let event of events) {
+            console.log(JSON.stringify(event))
             if (event.event in this.eventHandlers) {
                 this[this.eventHandlers[event.event]](room, event)
             }
+        }
+    },
+
+    objectDestroyedHandler: function(room, event) {
+        if (event.data.type == "creep") {
+            room.memory.state.creepsByRoles = roomRoleUtils.getCreepsByRoles(room)
         }
     },
 }
