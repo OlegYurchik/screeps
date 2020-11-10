@@ -12,6 +12,7 @@ let manager = {
     },
 
     loop: function() {
+        start = performance.time()
         for (let roomName in Game.rooms) {
             roomManager.loop(Game.rooms[roomName])
         }
@@ -23,6 +24,8 @@ let manager = {
         for (let creepName in Game.creeps) {
             creepManager.loop(Game.creeps[creepName])
         }
+        end = performance.time()
+        console.log("Iteration time:", start - end)
     },
 }
 
