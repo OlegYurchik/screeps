@@ -25,16 +25,36 @@ let creepRoleBuilder = {
     },
 
     loop: function(creep) {
-        // Get source and target, calculate paths
-        let source = this.chooseSource(creep)
-        let target = this.chooseTarget(creep)
+        // Get source and target
+        let source
+        let target
+        if (creep.memory.roleData.forceSource) {
+            source = creep.memory.roleData.forceSource
+        }
+        if (!source) {
+            source = this.chooseDroppedResource(creep)
+        }
+        if (!source) {
+            source = this.chooseTombstone(creep)
+        }
+        if (!source) {
+            source = this.chooseSource(creep)
+        }
+        if (creep.memory.roleData.forceTarget) {
+            target = creep.memory.roleData.forceTarget
+        }
+        if (!target) {
+            target = this.chooseTarget(creep)
+        }
+
+        // Calculate paths to source and target
         let pathToSource
         let pathToTarget
         if (source) {
-            pathToSource = creep.room.findPath(creep.pos, source.pos)
+            pathToSource = creep.room.findPath(creep.pos, source.pos, {ignoreCreeps: true})
         }
         if (target) {
-            pathToTarget = creep.room.findPath(creep.pos, target.pos)
+            pathToTarget = creep.room.findPath(creep.pos, target.pos, {ignoreCreeps: true})
         }
 
         // Set default state if state is undefined
@@ -50,12 +70,12 @@ let creepRoleBuilder = {
         } else if (creep.memory.roleData.state != stateHarvest &&
                    creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0 && source &&
                    source.energy > 0 && (creep.store[RESOURCE_ENERGY] == 0 ||
-                   (pathToSource && pathToTarget && pathToSource.length <= pathToTarget.length))) {
+                   (pathToTarget && pathToSource.length <= pathToTarget.length))) {
             creep.memory.roleData.state = stateHarvest
         } else if (creep.memory.roleData.state != stateBuild &&
                    creep.store[RESOURCE_ENERGY] > 0 && target &&
                    (creep.store.getFreeCapacity(RESOURCE_ENERGY) == 0 ||
-                   (pathToSource && pathToTarget && pathToTarget.length <= pathToSource.length))) {
+                   (pathToSource && pathToTarget.length <= pathToSource.length))) {
             creep.memory.roleData.state = stateBuild
         }
 
@@ -63,11 +83,30 @@ let creepRoleBuilder = {
         if (creep.memory.roleData.state == stateBuild) {
             creepRoleUtils.doBuild(creep, target, this.pathColor, this.reusePath)
         } else if (creep.memory.roleData.state == stateHarvest) {
-            creepRoleUtils.doHarvest(creep, source, this.pathColor, this.reusePath)
+            if (source instanceof Resource) {
+                creepRoleUtils.doPickup(creep, source, this.pathColor, this.reusePath)
+            } else if (source instanceof Tombstone) {
+                creepRoleUtils.doWithdraw(creep, source, RESOURCE_ENERGY, this.pathColor,
+                                          this.reusePath)
+            } else if (source instanceof Source) {
+                creepRoleUtils.doHarvest(creep, source, this.pathColor, this.reusePath)
+            }
         } else if (creep.memory.roleData.state == stateRest &&
                    creep.memory.roleData.restPoint) {
             creepRoleUtils.doRest(creep, creep.memory.roleData.restPoint, this.reusePath)
         }
+    },
+
+    chooseDroppedResource: function(creep) {
+        return creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {filter: function(resource) {
+            return resource.resourceType == RESOURCE_ENERGY && resource.amount > 0
+        }})
+    },
+
+    chooseTombstone: function(creep) {
+        return creep.pos.findClosestByPath(FIND_TOMBSTONES, {filter: function(tombstone) {
+            return tombstone.source[RESOURCE_ENERGY] > 0
+        }})
     },
 
     chooseSource: function(creep) {

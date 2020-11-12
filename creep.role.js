@@ -1,11 +1,11 @@
 const creepRoleBuilder = require("creep.role.builder")
-const creepRoleSpawner = require("creep.role.spawner")
+const creepRoleHarvester = require("creep.role.harvester")
 const creepRoleUpgrader = require("creep.role.upgrader")
 
 let creepRoles = {
-    default: creepRoleSpawner,
+    default: creepRoleHarvester,
     [creepRoleBuilder.name]: creepRoleBuilder,
-    [creepRoleSpawner.name]: creepRoleSpawner,
+    [creepRoleHarvester.name]: creepRoleHarvester,
     [creepRoleUpgrader.name]: creepRoleUpgrader,
 }
 

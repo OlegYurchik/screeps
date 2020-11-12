@@ -2,7 +2,8 @@ let killCreepTask = {
     name: "killCreep",
 
     action: function(task, room) {
-        creep = room.memory.state.creepByRoles[task.data.role].pop()
+        let creepName = room.memory.roleData.state.creepsByRole[task.data.role].pop()
+        let creep = Game.creeps[creepName]
         creep.suicide()
         return true
     },

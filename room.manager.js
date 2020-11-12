@@ -1,4 +1,3 @@
-const roomRoleUtils = require("room.role.utils")
 const roomRoles = require("room.role")
 
 /* 
@@ -6,21 +5,14 @@ const roomRoles = require("room.role")
 * initialized: bool
 * role: string
 * roleData: object
-* state: object
-* * creepsByRoles: object
-* targetState: object
 */
 
 let roomManager = {
-    init: function(room) {
+    init: function(room, roleName) {
         if (!room.memory.initialized) {
             room.memory.initialized = true
-            room.memory.role = roomRoles.default.name
+            room.memory.role = roleName ? roleName : roomRoles.default.name
             room.memory.roleData = {}
-            room.memory.state = {
-                creepsByRoles: roomRoleUtils.getCreepsByRoles(room),
-            }
-            room.memory.targetState = {}
         }
     },
 
@@ -30,6 +22,11 @@ let roomManager = {
         } else {
             console.log("WARNING: unknown role", room.memory.role, "in room", room.name)
         }
+    },
+
+    reinitialize: function(room, roleName) {
+        room.memory.initialized = false
+        this.init(room, roleName)
     },
 }
 
