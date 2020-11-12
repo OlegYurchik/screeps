@@ -1,10 +1,10 @@
 const creepRoleUtils = require("creep.role.utils")
 const stateRest = 0
 const stateHarvest = 1
-const stateBuild = 2
+const stateRepair = 2
 
 /*
-* Builder creep fields *
+* Repairer creep fields *
 * state: int
 * restPoint: object
 * forceSource: object
@@ -12,11 +12,11 @@ const stateBuild = 2
 * forceRest: bool
 */ 
 
-let creepRoleBuilder = {
-    name: "builder",
+let creepRoleRepairer = {
+    name: "repairer",
     pathColor: "#42aaff",
     reusePath: 100,
-    states: [stateRest, stateHarvest, stateBuild],
+    states: [stateRest, stateHarvest, stateRepair],
     defaultState: stateRest,
     body: {
         [WORK]: 1,
@@ -72,16 +72,16 @@ let creepRoleBuilder = {
                    source.energy > 0 && (creep.store[RESOURCE_ENERGY] == 0 ||
                    (pathToTarget && pathToSource.length <= pathToTarget.length))) {
             creep.memory.roleData.state = stateHarvest
-        } else if (creep.memory.roleData.state != stateBuild &&
-                   creep.store[RESOURCE_ENERGY] > 0 && target &&
+        } else if (creep.memory.roleData.state != stateRepair &&
+                   creep.store[RESOURCE_ENERGY] > 0 && target && target.hits < target.hitsMax &&
                    (creep.store.getFreeCapacity(RESOURCE_ENERGY) == 0 ||
                    (pathToSource && pathToTarget.length <= pathToSource.length))) {
-            creep.memory.roleData.state = stateBuild
+            creep.memory.roleData.state = stateRepair
         }
 
         // Do action
-        if (creep.memory.roleData.state == stateBuild) {
-            creepRoleUtils.doBuild(creep, target, this.pathColor, this.reusePath)
+        if (creep.memory.roleData.state == stateRepair) {
+            creepRoleUtils.doRepair(creep, target, this.pathColor, this.reusePath)
         } else if (creep.memory.roleData.state == stateHarvest) {
             if (source instanceof Resource) {
                 creepRoleUtils.doPickup(creep, source, this.pathColor, this.reusePath)
@@ -122,7 +122,9 @@ let creepRoleBuilder = {
         if (creep.memory.roleData.forceTarget) {
             return creep.memory.roleData.forceTarget
         }
-        return creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES)
+        return creep.pos.findClosestByPath(FIND_STRUCTURES, {filter: function(structure) {
+            return structure.hits < structure.hitsMax
+        }})
     },
 
     setRestState: function(creep) {
@@ -138,8 +140,8 @@ let creepRoleBuilder = {
         return true
     },
 
-    setBuildState: function(creep) {
-        creep.memory.roleData.state = stateBuild
+    setRepairState: function(creep) {
+        creep.memory.roleData.state = stateRepair
         return true
     },
 
@@ -184,4 +186,4 @@ let creepRoleBuilder = {
     },
 }
 
-module.exports = creepRoleBuilder
+module.exports = creepRoleRepairer

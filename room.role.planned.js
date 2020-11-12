@@ -90,8 +90,8 @@ let roomRolePlanned = {
         for (let roleName1 in creepsByRoleDifference) {
             if (creepsByRoleDifference[roleName1] < 0) {
                 for (let roleName2 in creepsByRoleDifference) {
-                    if (creepsByRoleDifference[roleName2] > 0 &&
-                        creepRoles[roleName1].body == creepRoles[roleName2].body) {
+                    // TODO: Add compairing with body items
+                    if (creepsByRoleDifference[roleName2] > 0) {
                         let count = Math.min(
                             Math.abs(creepsByRoleDifference[roleName1]),
                             creepsByRoleDifference[roleName2],

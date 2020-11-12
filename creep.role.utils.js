@@ -31,6 +31,17 @@ let doPickup = function(creep, target, pathColor, reusePath) {
     }
 }
 
+let doRepair = function(creep, target, pathColor, reusePath) {
+    let result = creep.repair(target)
+    if (result == ERR_NOT_IN_RANGE) {
+        creep.say("🔧")
+        creep.moveTo(target, {
+            visualizePathStyle: {stroke: pathColor},
+            reusePath: reusePath,
+        })
+    }
+}
+
 let doRest = function(creep, pos, reusePath) {
     if (creep.pos != pos) {
         creep.say("🏠")
@@ -78,6 +89,7 @@ module.exports = {
     doBuild: doBuild,
     doHarvest: doHarvest,
     doPickup, doPickup,
+    doRepair: doRepair,
     doRest: doRest,
     doTransfer: doTransfer,
     doUpgrade: doUpgrade,

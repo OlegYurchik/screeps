@@ -96,7 +96,7 @@ let creepRoleUpgrader = {
 
     chooseTombstone: function(creep) {
         return creep.pos.findClosestByPath(FIND_TOMBSTONES, {filter: function(tombstone) {
-            return tombstone.source[RESOURCE_ENERGY] > 0
+            return tombstone.store[RESOURCE_ENERGY] > 0
         }})
     },
 

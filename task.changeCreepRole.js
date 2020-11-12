@@ -2,9 +2,10 @@ let changeCreepRoleTask = {
     name: "changeCreepRole",
 
     action: function(task, room) {
-        let creep = room.memory.roleData.state.creepsByRole[task.data.originalRole].pop()
+        let creepName = room.memory.roleData.state.creepsByRole[task.data.originalRole].pop()
+        let creep = Game.creeps[creepName]
         creep.memory.role = task.data.role
-        room.memory.roleData.state.creepsByRole[task.data.role].push(creep)
+        room.memory.roleData.state.creepsByRole[task.data.role].push(creepName)
         return true
     },
 }
