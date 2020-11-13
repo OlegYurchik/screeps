@@ -51,8 +51,22 @@ const creepRoleUpgrader = {
     },
 
     do(creep, source, pathToSource, target, pathToTarget) {
-
+        if (creep.memory.roleData.state == this.stateAction) {
+            creepRoleUtils.doUpgrade(creep, this.pathColor, this.reusePath);
+        } else if (creep.memory.roleData.state == this.stateHarvest) {
+            if (source instanceof Resource) {
+                creepRoleUtils.doPickup(creep, source, this.pathColor, this.reusePath);
+            } else if (source instanceof Tombstone) {
+                creepRoleUtils.doWithdraw(creep, source, RESOURCE_ENERGY, this.pathColor,
+                                          this.reusePath);
+            } else if (source instanceof Source) {
+                creepRoleUtils.doHarvest(creep, source, this.pathColor, this.reusePath);
+            }
+        } else if (creep.memory.roleData.state == this.stateRest &&
+                   creep.memory.roleData.restPoint) {
+            creepRoleUtils.doRest(creep, creep.memory.roleData.restPoint, this.reusePath);
+        }
     },
-}
+};
 
 module.exports = creepRoleUpgrader;
