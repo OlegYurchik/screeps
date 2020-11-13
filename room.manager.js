@@ -1,5 +1,3 @@
-const roomRoles = require("room.role")
-
 /* 
 * Room required fields *
 * initialized: bool
@@ -7,27 +5,25 @@ const roomRoles = require("room.role")
 * roleData: object
 */
 
-let roomManager = {
-    init: function(room, roleName) {
+const roomRoles = require("room.roles");
+
+const roomManager = {
+    init(room, roleName) {
         if (!room.memory.initialized) {
-            room.memory.initialized = true
-            room.memory.role = roleName ? roleName : roomRoles.default.name
-            room.memory.roleData = {}
+            room.memory.initialized = true;
+            room.memory.role = roleName ? roleName : roomRoles.default.name;
+            room.memory.roleData = {};
         }
     },
 
-    loop: function(room) {
+    loop(room) {
+        this.init(room);
         if (room.memory.role in roomRoles) {
-            roomRoles[room.memory.role].loop(room)
+            roomRoles[room.memory.role].loop(room);
         } else {
-            console.log("WARNING: unknown role", room.memory.role, "in room", room.name)
+            console.log("WARNING: unknown role", room.memory.role, "in room", room.name);
         }
-    },
-
-    reinitialize: function(room, roleName) {
-        room.memory.initialized = false
-        this.init(room, roleName)
     },
 }
 
-module.exports = roomManager
+module.exports = roomManager;

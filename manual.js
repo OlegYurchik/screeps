@@ -1,26 +1,24 @@
-let roomRolePlanned = require("room.role.planned")
+const roomRolePlanned = require("room.role.planned");
 
-let manual = {
+module.exports = {
     setPlannedRoomTargetState: function(roomName, creepsByRole) {
-        roomRolePlanned.setTargetState(Game.rooms[roomName], creepsByRole)
-        return true
+        roomRolePlanned.setTargetState(Game.rooms[roomName], creepsByRole);
+        return true;
     },
 
     killAllCreeps: function(roomName) {
-        let creeps
+        var creeps;
         if (roomName) {
-            creeps = Game.rooms[roomName].find(FIND_MY_CREEPS)
+            creeps = Game.rooms[roomName].find(FIND_MY_CREEPS);
         } else {
-            creeps = []
+            creeps = [];
             for (let creepName in Game.creeps) {
-                creeps.push(Game.creeps[creepName])
+                creeps.push(Game.creeps[creepName]);
             }
         }
         for (let creep of creeps) {
-            creep.suicide()
+            creep.suicide();
         }
-        return true
+        return true;
     },
-}
-
-module.exports = manual
+};

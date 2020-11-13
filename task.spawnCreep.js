@@ -1,51 +1,52 @@
 const creepManager = require("creep.manager")
-const creepRoles = require("creep.role")
+const creepRoles = require("creep.roles")
 
-let getRandomString = function(count) {
-    let result = ""
-    while (result.length < count) {
-        result += Math.random().toString(36).substring(2)
-    }
-    return result.substring(0, count)
-}
-
-let spawnCreepTask = {
+const spawnCreepTask = {
     name: "spawnCreep",
 
-    action: function(task, room) {
-        let created = false
-        let creepRole = creepRoles[task.data.role]
-        let spawns = room.find(FIND_MY_SPAWNS, {filter: function(spawn) {
-            return spawn.spawning === null
-        }})
-        for (let spawn of spawns) {
+    getRandomString(count) {
+        var result = "";
+        while (result.length < count) {
+            result += Math.random().toString(36).substring(2);
+        }
+        return result.substring(0, count);
+    },
 
-            let body = []
-            for (let bodyItem in creepRole.body) {
+    action(task, room) {
+        var created = false;
+        var creepRole = creepRoles[task.data.role];
+        var spawns = room.find(FIND_MY_SPAWNS, {filter: function(spawn) {
+            return spawn.spawning === null;
+        }});
+        for (let spawn of spawns) {
+            let body = [];
+            for (let bodyItem of creepRole.body) {
                 for (let count = 0; count < creepRole.body[bodyItem]; count++) {
-                    body.push(bodyItem)
+                    body.push(bodyItem);
                 }
             }
             while (true) {
-                let creepName = getRandomString(8)
-                let result = spawn.spawnCreep(body, creepName, {memory: {role: task.data.role}})
+                let creepName = this.getRandomString(8);
+                let result = spawn.spawnCreep(creepRole.body, creepName, {
+                    memory: {role: task.data.role},
+                });
                 if (result == ERR_NAME_EXISTS) {
-                    continue
+                    continue;
                 }
                 if (result == OK) {
-                    created = true
+                    created = true;
                     if (!(task.data.role in room.memory.roleData.state.creepsByRole)) {
-                        room.memory.roleData.state.creepsByRole[task.data.role] = []
+                        room.memory.roleData.state.creepsByRole[task.data.role] = [];
                     }
-                    let creep = Game.creeps[creepName]
-                    room.memory.roleData.state.creepsByRole[task.data.role].push(creep.name)
-                    creepManager.init(creep, task.data.role)
+                    let creep = Game.creeps[creepName];
+                    room.memory.roleData.state.creepsByRole[task.data.role].push(creep.name);
+                    creepManager.init(creep, task.data.role);
                 }
-                break
+                break;
             }
         }
-        return created
+        return created;
     }
-}
+};
 
-module.exports = spawnCreepTask
+module.exports = spawnCreepTask;

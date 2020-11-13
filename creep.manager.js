@@ -1,5 +1,3 @@
-const creepRoles = require("creep.role")
-
 /* 
 * Creep required fields *
 * initialized: bool
@@ -7,31 +5,25 @@ const creepRoles = require("creep.role")
 * roleData: object
 */
 
-let creepManager = {
-    init: function(creep, roleName) {
+const creepRoles = require("creep.roles");
+
+const creepManager = {
+    init(creep, roleName) {
         if (!creep.memory.initialized) {
-            creep.memory.initialized = true
-            creep.memory.role = roleName ? roleName : creepRoles.default.name
-            creep.memory.roleData = {}
+            creep.memory.initialized = true;
+            creep.memory.role = roleName ? roleName : creepRoles.default.name;
+            creep.memory.roleData = {};
         }
     },
 
-    loop: function(creep) {
+    loop(creep) {
+        this.init(creep);
         if (creep.memory.role in creepRoles) {
-            creepRoles[creep.memory.role].loop(creep)
+            creepRoles[creep.memory.role].loop(creep);
         } else {
-            console.log("WARNING: unknown role", creep.memory.role, "in creep", creep.id)
+            console.log("WARNING: unknown role", creep.memory.role, "in creep", creep.id);
         }
-    },
-
-    reinitialize: function(creep, roleName) {
-        creep.memory.initialized = false
-        this.init(creep, roleName)
-    },
-
-    setRole: function(creep, roleName) {
-        creep.memory.role = roleNae
     },
 }
 
-module.exports = creepManager
+module.exports = creepManager;
