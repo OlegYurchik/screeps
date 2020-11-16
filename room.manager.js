@@ -8,11 +8,12 @@
 const roomRoles = require("room.roles");
 
 const roomManager = {
-    init(room, roleName) {
+    init(room, roleName, roleData) {
         if (!room.memory.initialized) {
             room.memory.initialized = true;
             room.memory.role = roleName ? roleName : roomRoles.default.name;
             room.memory.roleData = {};
+            roomRoles[room.memory.role].init(room, roleData);
         }
     },
 

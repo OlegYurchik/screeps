@@ -18,7 +18,10 @@ const creepRoleWorker = {
     stateAction: stateAction,
     states: [stateRest, stateHarvest, stateAction],
     defaultState: stateRest,
-    body: [CARRY, MOVE, WORK],
+
+    init(creep, roleData) {
+
+    },
 
     loop(creep) {
         var source, target, pathToSource, pathToTarget;

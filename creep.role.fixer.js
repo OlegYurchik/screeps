@@ -1,14 +1,14 @@
 /*
-* Creep Role Repair *
+* Creep Role Fixer *
 */
 
 const creepRoleUtils = require("creep.role.utils");
 const creepRoleWorker = require("creep.role.worker");
 
-let creepRoleRepairer = {
+let creepRoleFixer = {
     __proto__: creepRoleWorker,
 
-    name: "repairer",
+    name: "fixer",
     pathColor: "#42aaff",
     // reusePath: 100,
 
@@ -77,4 +77,4 @@ let creepRoleRepairer = {
     },
 };
 
-module.exports = creepRoleRepairer;
+module.exports = creepRoleFixer;

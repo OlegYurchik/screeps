@@ -1,4 +1,16 @@
-const doBuild = function(creep, target, pathColor, reusePath) {
+function doAttack(creep, target, pathColor, reusePath) {
+    var result = creep.attack(target);
+    if (result == ERR_NOT_IN_RANGE) {
+        creep.say("👊");
+        creep.moveTo(target, {
+            visualizePathStyle: {stroke: pathColor},
+            reusePath: reusePath,
+            // ignoreCreeps: true.
+        });
+    }
+}
+
+function doBuild(creep, target, pathColor, reusePath) {
     var result = creep.build(target);
     if (result == ERR_NOT_IN_RANGE) {
         creep.say("🚧");
@@ -8,9 +20,9 @@ const doBuild = function(creep, target, pathColor, reusePath) {
             // ignoreCreeps: true,
         });
     }
-};
+}
 
-const doHarvest = function(creep, target, pathColor, reusePath) {
+function doHarvest(creep, target, pathColor, reusePath) {
     var result = creep.harvest(target);
     if (result == ERR_NOT_IN_RANGE) {
         creep.say("⛏");
@@ -20,9 +32,9 @@ const doHarvest = function(creep, target, pathColor, reusePath) {
             // ignoreCreeps: true,
         });
     }
-};
+}
 
-const doPickup = function(creep, target, pathColor, reusePath) {
+function doPickup(creep, target, pathColor, reusePath) {
     var result = creep.pickup(target);
     if (result == ERR_NOT_IN_RANGE) {
         creep.say("🤏");
@@ -34,7 +46,7 @@ const doPickup = function(creep, target, pathColor, reusePath) {
     }
 };
 
-const doRepair = function(creep, target, pathColor, reusePath) {
+function doRepair(creep, target, pathColor, reusePath) {
     var result = creep.repair(target);
     if (result == ERR_NOT_IN_RANGE) {
         creep.say("🔧");
@@ -44,9 +56,9 @@ const doRepair = function(creep, target, pathColor, reusePath) {
             // ignoreCreeps: true,
         });
     }
-};
+}
 
-const doRest = function(creep, pos, reusePath) {
+function doRest(creep, pos, reusePath) {
     if (creep.pos != pos) {
         creep.say("🏠");
         creep.moveTo(pos, {
@@ -55,9 +67,9 @@ const doRest = function(creep, pos, reusePath) {
             // ignoreCreeps: true,
         });
     }
-};
+}
 
-const doTransfer = function(creep, target, resourceType, pathColor, reusePath) {
+function doTransfer(creep, target, resourceType, pathColor, reusePath) {
     var result = creep.transfer(target, resourceType);
     if (result == ERR_NOT_IN_RANGE) {
         creep.say("📦");
@@ -67,9 +79,9 @@ const doTransfer = function(creep, target, resourceType, pathColor, reusePath) {
             // ignoreCreeps: true,
         });
     }
-};
+}
 
-const doUpgrade = function(creep, pathColor, reusePath) {
+function doUpgrade(creep, pathColor, reusePath) {
     var result = creep.upgradeController(creep.room.controller);
     if (result == ERR_NOT_IN_RANGE) {
         creep.say("⬆");
@@ -79,9 +91,9 @@ const doUpgrade = function(creep, pathColor, reusePath) {
             // ignoreCreeps: true,
         });
     }
-};
+}
 
-const doWithdraw = function(creep, target, resourceType, pathColor, reusePath) {
+function doWithdraw(creep, target, resourceType, pathColor, reusePath) {
     var result = creep.withdraw(target, resourceType);
     if (result == ERR_NOT_IN_RANGE) {
         creep.say("🤏");
@@ -91,9 +103,9 @@ const doWithdraw = function(creep, target, resourceType, pathColor, reusePath) {
             // ignoreCreeps: true,
         });
     }
-};
+}
 
-const getCreepHash = function(roleName, body) {
+function getCreepHash(roleName, body) {
     var string = roleName + body.sort().join("");
     var hash = 0;
     for (let i = 0; i < string.length; i++) {
@@ -102,9 +114,10 @@ const getCreepHash = function(roleName, body) {
         hash = hash & hash;
     }
     return hash.toString();
-};
+}
 
 module.exports = {
+    doAttack: doAttack,
     doBuild: doBuild,
     doHarvest: doHarvest,
     doPickup, doPickup,

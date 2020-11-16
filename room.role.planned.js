@@ -11,15 +11,33 @@ const creepRoles = require("creep.roles");
 const creepRoleUtils = require("creep.role.utils");
 const taskTypes = require("tasks");
 
+function arraysEquals(array1, array2) {
+    if (array1.length != array2.length) {
+        return false;
+    }
+    for (let index = 0; index < array1.length; index++) {
+        if (array1[index] != array2[index]) {
+            return false;
+        }
+    }
+    return true;
+}
+
 const roomRolePlanned = {
     name: "planned",
     eventHandlers: {
         [EVENT_OBJECT_DESTROYED]: "objectDestroyedHandler",
     },
     creepRolePriority: {
-        [creepRoles.harvester.name]: 3,
+        [creepRoles.harvester.name]: 5,
+        [creepRoles.guard.name]: 4,
+        [creepRoles.fixer.name]: 3,
         [creepRoles.upgrader.name]: 2,
         [creepRoles.builder.name]: 1,
+    },
+
+    init(room, roleData) {
+
     },
 
     loop(room) {
@@ -110,8 +128,11 @@ const roomRolePlanned = {
         for (let hash1 in creepsByHashDifference) {
             if (creepsByHashDifference[hash1].count < 0) {
                 for (let hash2 in creepsByHashDifference) {
-                    // TODO: Add compairing with body items
-                    if (creepsByHashDifference[hash2].count > 0) {
+                    if (creepsByHashDifference[hash2].count > 0 &&
+                        arraysEquals(
+                            creepsByHashDifference[hash1].body.sort(),
+                            creepsByHashDifference[hash2].body.sort(),
+                        )) {
                         let count = Math.min(
                             -creepsByHashDifference[hash1].count,
                             creepsByHashDifference[hash2].count,

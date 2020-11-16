@@ -8,11 +8,12 @@
 const creepRoles = require("creep.roles");
 
 const creepManager = {
-    init(creep, roleName) {
+    init(creep, roleName, roleData) {
         if (!creep.memory.initialized) {
             creep.memory.initialized = true;
             creep.memory.role = roleName ? roleName : creepRoles.default.name;
             creep.memory.roleData = {};
+            creepRoles[creep.memory.role].init(creep, roleData);
         }
     },
 
