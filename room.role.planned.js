@@ -62,7 +62,7 @@ const roomRolePlanned = {
                     creepsNames: [],
                 };
             }
-            creeps[hash].creepsNames.push(creep.id);
+            creeps[hash].creepsNames.push(creep.name);
         }
         return creeps;
     },

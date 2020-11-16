@@ -38,11 +38,11 @@ const spawnCreepTask = {
                         creepName,
                     );
                     creepManager.init(Game.creeps[creepName], task.data.role);
+                    return created;
                 }
                 break;
             }
         }
-        return created;
     }
 };
 
