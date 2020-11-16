@@ -10,7 +10,7 @@ const creepRoleBuilder = {
 
     name: "builder",
     pathColor: "#42aaff",
-    reusePath: 100,
+    // reusePath: 100,
 
     chooseSource(creep) {
         var source = creep.pos.findClosestByPath(FIND_SOURCES, {filter: function(source) {
