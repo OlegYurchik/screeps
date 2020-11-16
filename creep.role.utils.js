@@ -5,6 +5,7 @@ const doBuild = function(creep, target, pathColor, reusePath) {
         creep.moveTo(target, {
             visualizePathStyle: {stroke: pathColor},
             reusePath: reusePath,
+            // ignoreCreeps: true,
         });
     }
 };
@@ -16,6 +17,7 @@ const doHarvest = function(creep, target, pathColor, reusePath) {
         creep.moveTo(target, {
             visualizePathStyle: {stroke: pathColor},
             reusePath: reusePath,
+            // ignoreCreeps: true,
         });
     }
 };
@@ -27,6 +29,7 @@ const doPickup = function(creep, target, pathColor, reusePath) {
         creep.moveTo(target, {
             visualizePathStyle: {stroke: pathColor},
             reusePath: reusePath,
+            // ignoreCreeps: true,
         });
     }
 };
@@ -38,6 +41,7 @@ const doRepair = function(creep, target, pathColor, reusePath) {
         creep.moveTo(target, {
             visualizePathStyle: {stroke: pathColor},
             reusePath: reusePath,
+            // ignoreCreeps: true,
         });
     }
 };
@@ -48,6 +52,7 @@ const doRest = function(creep, pos, reusePath) {
         creep.moveTo(pos, {
             visualizePathStyle: {stroke: "#ffffff"},
             reusePath: reusePath,
+            // ignoreCreeps: true,
         });
     }
 };
@@ -59,6 +64,7 @@ const doTransfer = function(creep, target, resourceType, pathColor, reusePath) {
         creep.moveTo(target, {
             visualizePathStyle: {stroke: pathColor},
             reusePath: reusePath,
+            // ignoreCreeps: true,
         });
     }
 };
@@ -70,6 +76,7 @@ const doUpgrade = function(creep, pathColor, reusePath) {
         creep.moveTo(creep.room.controller, {
             visualizePathStyle: {stroke: pathColor},
             reusePath: reusePath,
+            // ignoreCreeps: true,
         });
     }
 };
@@ -81,8 +88,20 @@ const doWithdraw = function(creep, target, resourceType, pathColor, reusePath) {
         creep.moveTo(target, {
             visualizePathStyle: {stroke: pathColor},
             reusePath: reusePath,
+            // ignoreCreeps: true,
         });
     }
+};
+
+const getCreepHash = function(roleName, body) {
+    var string = roleName + body.sort().join("");
+    var hash = 0;
+    for (let i = 0; i < string.length; i++) {
+        let character = string.charCodeAt(i);
+        hash = ((hash<<5)-hash)+character;
+        hash = hash & hash;
+    }
+    return hash.toString();
 };
 
 module.exports = {
@@ -94,4 +113,5 @@ module.exports = {
     doTransfer: doTransfer,
     doUpgrade: doUpgrade,
     doWithdraw: doWithdraw,
+    getCreepHash: getCreepHash,
 };

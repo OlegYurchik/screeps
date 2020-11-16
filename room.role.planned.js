@@ -1,15 +1,15 @@
 /*
 * Room Role Planned *
 * state: object
-* * creepsByRole: object
+* * creepsByHash: object
 * targetState: object
-* * creepsByRole: object
+* * creepsByHash: object
 * tasks: array of object
 */
 
-
 const creepRoles = require("creep.roles");
-const taskTypes = require("task");
+const creepRoleUtils = require("creep.role.utils");
+const taskTypes = require("tasks");
 
 const roomRolePlanned = {
     name: "planned",
@@ -25,7 +25,7 @@ const roomRolePlanned = {
     loop(room) {
         if (room.memory.roleData.state === undefined) {
             room.memory.roleData.state = {
-                creepsByRole: this.getCreepsByRole(room),
+                creepsByHash: this.getCreepsByHash(room),
             };
         }
         if (room.memory.roleData.targetState === undefined) {
@@ -51,84 +51,109 @@ const roomRolePlanned = {
         }
     },
 
-    getCreepsByRole(room) {
+    getCreepsByHash(room) {
         var creeps = {};
         for (let creep of room.find(FIND_MY_CREEPS)) {
-            if (creep.memory.role in creepRoles) {
-                if (!(creep.memory.role in creeps)) {
-                    creeps[creep.memory.role] = [];
-                }
-                creeps[creep.memory.role].push(creep.name);
+            let hash = creepRoleUtils.getCreepHash(creep.memory.role, creep.body);
+            if (!(hash in creeps)) {
+                creeps[hash] = {
+                    role: creep.memory.role,
+                    body: creep.body.sort(),
+                    creepsNames: [],
+                };
             }
+            creeps[hash].creepsNames.push(creep.id);
         }
         return creeps;
     },
 
     calculateCreepTasks(room) {
-        if (!room.memory.roleData.targetState.creepsByRole) {
+        if (!room.memory.roleData.targetState.creepsByHash) {
             return [];
         }
     
         // Calculate difference beetwen current and want creeps states
-        var creepsByRoleDifference = {};
-        for (let roleName in room.memory.roleData.targetState.creepsByRole) {
+        var creepsByHashDifference = {};
+        for (let hash in room.memory.roleData.targetState.creepsByHash) {
             let current;
-            if (roleName in room.memory.roleData.state.creepsByRole) {
-                current = room.memory.roleData.state.creepsByRole[roleName].length;
+            if (hash in room.memory.roleData.state.creepsByHash) {
+                current = room.memory.roleData.state.creepsByHash[hash].creepsNames.length;
             } else {
                 current = 0;
             }
-            if (current != room.memory.roleData.targetState.creepsByRole[roleName]) {
-                creepsByRoleDifference[roleName] =
-                    room.memory.roleData.targetState.creepsByRole[roleName] - current;
+            if (current != room.memory.roleData.targetState.creepsByHash[hash].count) {
+                creepsByHashDifference[hash] = {
+                    role: room.memory.roleData.targetState.creepsByHash[hash].role,
+                    body: room.memory.roleData.targetState.creepsByHash[hash].body,
+                    count: room.memory.roleData.targetState.creepsByHash[hash].count - current,
+                };
             }
         }
-        
+        for (let hash in room.memory.roleData.state.creepsByHash) {
+            if (hash in room.memory.roleData.targetState.creepsByHash) {
+                continue;
+            }
+            let current = room.memory.roleData.state.creepsByHash[hash].creepsNames.length;
+            if (current) {
+                creepsByHashDifference[hash] = {
+                    role: room.memory.roleData.state.creepsByHash[hash].role,
+                    body: room.memory.roleData.state.creepsByHash[hash].body,
+                    count: -current,
+                };
+            }
+        }
+
         // Calculate tasks for change creeps
         var changeCreepRoleTasks = [];
         var killCreepTasks = [];
         var spawnCreepTasks = [];
-        for (let roleName1 in creepsByRoleDifference) {
-            if (creepsByRoleDifference[roleName1] < 0) {
-                for (let roleName2 in creepsByRoleDifference) {
+        for (let hash1 in creepsByHashDifference) {
+            if (creepsByHashDifference[hash1].count < 0) {
+                for (let hash2 in creepsByHashDifference) {
                     // TODO: Add compairing with body items
-                    if (creepsByRoleDifference[roleName2] > 0) {
+                    if (creepsByHashDifference[hash2].count > 0) {
                         let count = Math.min(
-                            Math.abs(creepsByRoleDifference[roleName1]),
-                            creepsByRoleDifference[roleName2],
+                            -creepsByHashDifference[hash1].count,
+                            creepsByHashDifference[hash2].count,
                         );
                         for (let i = 0; i < count; i++) {
                             changeCreepRoleTasks.push({
                                 action: taskTypes.changeCreepRole.name,
                                 data: {
-                                    originalRole: roleName1,
-                                    role: roleName2,
+                                    originalHash: hash1,
+                                    hash: hash2,
+                                    originalRole: creepsByHashDifference[hash1].role,
+                                    role: creepsByHashDifference[hash2].role,
                                 },
                             });
                         }
-                        creepsByRoleDifference[roleName1] += count;
-                        creepsByRoleDifference[roleName2] -= count;
+                        creepsByHashDifference[hash1].count += count;
+                        creepsByHashDifference[hash2].count -= count;
                     }
                 }
             }
         }
-    
+
         // Calculate tasks for delete and create creeps
-        for (let roleName in creepsByRoleDifference) {
-            if (creepsByRoleDifference[roleName] < 0) {
-                let count = Math.abs(creepsByRoleDifference[roleName]);
+        for (let hash in creepsByHashDifference) {
+            if (creepsByHashDifference[hash].count < 0) {
+                let count = -creepsByHashDifference[hash].count;
                 for (let i = 0; i < count; i++) {
                     killCreepTasks.push({
                         action: taskTypes.killCreep.name,
-                        data: {role: roleName},
+                        data: {hash: hash},
                     });
                 }
-            } else if (creepsByRoleDifference[roleName] > 0) {
-                let count = creepsByRoleDifference[roleName];
+            } else if (creepsByHashDifference[hash].count > 0) {
+                let count = creepsByHashDifference[hash].count;
                 for (let i = 0; i < count; i++) {
                     spawnCreepTasks.push({
                         action: taskTypes.spawnCreep.name,
-                        data: {role: roleName},
+                        data: {
+                            hash: hash,
+                            role: creepsByHashDifference[hash].role,
+                            body: creepsByHashDifference[hash].body,
+                        },
                     });
                 }
             }
@@ -158,9 +183,16 @@ const roomRolePlanned = {
         return changeCreepRoleTasks.concat(spawnCreepTasks).concat(killCreepTasks);
     },
 
-    setTargetState: function(room, creepsByRole) {
+    setTargetState: function(room, targetState) {
+        var creepsByHash = {};
+        for (let state of targetState) {
+            let hash = creepRoleUtils.getCreepHash(state.role, state.body);
+            if (!(hash in creepsByHash)) {
+                creepsByHash[hash] = state;
+            }
+        }
         room.memory.roleData.targetState = {
-            creepsByRole: creepsByRole,
+            creepsByHash: creepsByHash,
         };
         room.memory.roleData.tasks = this.calculateCreepTasks(room);
     },
@@ -168,7 +200,7 @@ const roomRolePlanned = {
     // Event handlers
     objectDestroyedHandler: function(room, event) {
         if (event.data.type == "creep") {
-            room.memory.roleData.state.creepsByRole = this.getCreepsByRole(room);
+            room.memory.roleData.state.creepsByHash = this.getCreepsByHash(room);
             room.memory.roleData.tasks = this.calculateCreepTasks(room);
         }
     },

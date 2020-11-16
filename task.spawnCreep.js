@@ -1,5 +1,4 @@
-const creepManager = require("creep.manager")
-const creepRoles = require("creep.roles")
+const creepManager = require("creep.manager");
 
 const spawnCreepTask = {
     name: "spawnCreep",
@@ -14,20 +13,13 @@ const spawnCreepTask = {
 
     action(task, room) {
         var created = false;
-        var creepRole = creepRoles[task.data.role];
         var spawns = room.find(FIND_MY_SPAWNS, {filter: function(spawn) {
             return spawn.spawning === null;
         }});
         for (let spawn of spawns) {
-            let body = [];
-            for (let bodyItem of creepRole.body) {
-                for (let count = 0; count < creepRole.body[bodyItem]; count++) {
-                    body.push(bodyItem);
-                }
-            }
             while (true) {
                 let creepName = this.getRandomString(8);
-                let result = spawn.spawnCreep(creepRole.body, creepName, {
+                let result = spawn.spawnCreep(task.data.body, creepName, {
                     memory: {role: task.data.role},
                 });
                 if (result == ERR_NAME_EXISTS) {
@@ -35,12 +27,17 @@ const spawnCreepTask = {
                 }
                 if (result == OK) {
                     created = true;
-                    if (!(task.data.role in room.memory.roleData.state.creepsByRole)) {
-                        room.memory.roleData.state.creepsByRole[task.data.role] = [];
+                    if (!(task.data.hash in room.memory.roleData.state.creepsByHash)) {
+                        room.memory.roleData.state.creepsByHash[task.data.hash] = {
+                            role: task.data.role,
+                            body: task.data.body,
+                            creepsNames: [],
+                        };
                     }
-                    let creep = Game.creeps[creepName];
-                    room.memory.roleData.state.creepsByRole[task.data.role].push(creep.name);
-                    creepManager.init(creep, task.data.role);
+                    room.memory.roleData.state.creepsByHash[task.data.hash].creepsNames.push(
+                        creepName,
+                    );
+                    creepManager.init(Game.creeps[creepName], task.data.role);
                 }
                 break;
             }
