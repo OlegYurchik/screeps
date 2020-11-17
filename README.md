@@ -24,4 +24,11 @@
 * Fixer [MOVE, MOVE, MOVE, CARRY, CARRY, WORK, WORK]: number of places for harvest energy
 * Guard [MOVE, MOVE, MOVE, RANGED_ATTACK, RANGED_ATTACK, ATTACK, TOUGH, TOUGH]: number of exits * 2
 
-Task: [{role: "harvester", body: [MOVE, MOVE, MOVE, CARRY, CARRY, WORK, WORK],}]
+Task:
+
+Places for harvest energy = 5
+Exits = 3
+
+```
+require("room.role.planned").setTargetState(Game.rooms["W23S45"], [{role: "harvester", body: [MOVE, MOVE, MOVE, CARRY, CARRY, WORK, WORK], count: 5}, {role: "upgrader", body: [MOVE, MOVE, MOVE, CARRY, CARRY, WORK, WORK], count: 2}, {role: "builder", body: [MOVE, MOVE, MOVE, CARRY, CARRY, WORK, WORK], count: 2}, {role: "fixer", body: [MOVE, MOVE, MOVE, CARRY, CARRY, WORK, WORK], count: 5}, {role: "guard", body: [MOVE, MOVE, MOVE, RANGED_ATTACK, RANGED_ATTACK, ATTACK, TOUGH, TOUGH], count: 6}])
+```

@@ -43,7 +43,7 @@ let creepRoleHarvester = {
             },
         });
         if (!target) {
-            creep.pos.findClosestByPath(FIND_STRUCTURES, {
+            target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                 filter: function(structure) {
                     return (structure.structureType == STRUCTURE_SPAWN ||
                             structure.structureType == STRUCTURE_EXTENSION) &&
