@@ -29,9 +29,8 @@ const roomRolePlanned = {
         [EVENT_OBJECT_DESTROYED]: "objectDestroyedHandler",
     },
     creepRolePriority: {
-        [creepRoles.harvester.name]: 5,
-        [creepRoles.guard.name]: 4,
-        [creepRoles.fixer.name]: 3,
+        [creepRoles.harvester.name]: 4,
+        [creepRoles.guard.name]: 3,
         [creepRoles.upgrader.name]: 2,
         [creepRoles.builder.name]: 1,
     },

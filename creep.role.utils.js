@@ -22,6 +22,18 @@ function doBuild(creep, target, pathColor, reusePath) {
     }
 }
 
+function doFix(creep, target, pathColor, reusePath) {
+    var result = creep.repair(target);
+    if (result == ERR_NOT_IN_RANGE) {
+        creep.say("🔧");
+        creep.moveTo(target, {
+            visualizePathStyle: {stroke: pathColor},
+            reusePath: reusePath,
+            // ignoreCreeps: true,
+        });
+    }
+}
+
 function doHarvest(creep, target, pathColor, reusePath) {
     var result = creep.harvest(target);
     if (result == ERR_NOT_IN_RANGE) {
@@ -45,18 +57,6 @@ function doPickup(creep, target, pathColor, reusePath) {
         });
     }
 };
-
-function doRepair(creep, target, pathColor, reusePath) {
-    var result = creep.repair(target);
-    if (result == ERR_NOT_IN_RANGE) {
-        creep.say("🔧");
-        creep.moveTo(target, {
-            visualizePathStyle: {stroke: pathColor},
-            reusePath: reusePath,
-            // ignoreCreeps: true,
-        });
-    }
-}
 
 function doRest(creep, pos, reusePath) {
     if (creep.pos != pos) {
@@ -119,9 +119,9 @@ function getCreepHash(roleName, body) {
 module.exports = {
     doAttack: doAttack,
     doBuild: doBuild,
+    doFix: doFix,
     doHarvest: doHarvest,
     doPickup, doPickup,
-    doRepair: doRepair,
     doRest: doRest,
     doTransfer: doTransfer,
     doUpgrade: doUpgrade,

@@ -16,20 +16,32 @@ const creepRoleBuilder = {
         var source = creep.pos.findClosestByPath(FIND_SOURCES, {filter: function(source) {
             return source.energy > 0;
         }});
-        if (!source) {
-            source = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                filter: function(structure) {
-                    return (structure.structureType == STRUCTURE_CONTAINER ||
-                            structure.structureType == STRUCTURE_STORAGE) &&
-                            structure.store[RESOURCE_ENERGY] > 0;
-                },
-            });
+        if (source) {
+            return source;
         }
-        return source;
+        return creep.pos.findClosestByPath(FIND_STRUCTURES, {
+            filter: function(structure) {
+                return (structure.structureType == STRUCTURE_CONTAINER ||
+                        structure.structureType == STRUCTURE_STORAGE) &&
+                        structure.store[RESOURCE_ENERGY] > 0;
+            },
+        });
     },
 
     chooseTarget(creep) {
-        return creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
+        var target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
+        if (target) {
+            return target;
+        }
+        var structures = creep.room.find(FIND_STRUCTURES, {filter: function(structure) {
+            return structure.hits < structure.hitsMax;
+        }})
+        structures.sort(function(structure1, structure2) {
+            return structure1.hits - structure2.hits;
+        });
+        if (structures.length > 0) {
+            return structures[0];
+        }
     },
 
     chooseState(creep, source, pathToSource, target, pathToTarget) {
@@ -52,7 +64,11 @@ const creepRoleBuilder = {
 
     do(creep, source, pathToSource, target, pathToTarget) {
         if (creep.memory.roleData.state == this.stateAction) {
-            creepRoleUtils.doBuild(creep, target, this.pathColor, this.reusePath);
+            if (target instanceof ConstructionSite) {
+                creepRoleUtils.doBuild(creep, target, this.pathColor, this.reusePath);
+            } else if (target instanceof Structure) {
+                creepRoleUtils.doFix(creep, target, this.pathColor, this.reusePath);
+            }
         } else if (creep.memory.roleData.state == this.stateHarvest) {
             if (source instanceof Resource) {
                 creepRoleUtils.doPickup(creep, source, this.pathColor, this.reusePath);
