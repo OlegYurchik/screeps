@@ -18,6 +18,7 @@
 
 * Controller level: 4
 * Extensions: 10
+* Tower: 1
 * Harvester [MOVE, MOVE, MOVE, CARRY, CARRY, WORK, WORK]: number of places for harvest energy
 * Upgrader [MOVE, MOVE, MOVE, CARRY, CARRY, WORK, WORK]: number of places for harvest energy / 2
 * Builder [MOVE, MOVE, MOVE, CARRY, CARRY, WORK, WORK]: number of places for harvest energy / 2

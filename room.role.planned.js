@@ -11,12 +11,12 @@ const creepRoles = require("creep.roles");
 const creepRoleUtils = require("creep.role.utils");
 const taskTypes = require("tasks");
 
-function arraysEquals(array1, array2) {
-    if (array1.length != array2.length) {
+function bodyIsEqual(body, newItems) {
+    if (body.length != newItems.length) {
         return false;
     }
-    for (let index = 0; index < array1.length; index++) {
-        if (array1[index] != array2[index]) {
+    for (let index = 0; index < body.length; index++) {
+        if (body[index].type != newItems[index]) {
             return false;
         }
     }
@@ -129,7 +129,7 @@ const roomRolePlanned = {
             if (creepsByHashDifference[hash1].count < 0) {
                 for (let hash2 in creepsByHashDifference) {
                     if (creepsByHashDifference[hash2].count > 0 &&
-                        arraysEquals(
+                        bodyIsEqual(
                             creepsByHashDifference[hash1].body.sort(),
                             creepsByHashDifference[hash2].body.sort(),
                         )) {

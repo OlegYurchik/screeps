@@ -1,5 +1,6 @@
-const roomManager = require("room.manager");
 const creepManager = require("creep.manager");
+const roomManager = require("room.manager");
+const towerManager = require("tower.manager");
 
 module.exports.loop = function() {
     // Delete memory
@@ -9,11 +10,24 @@ module.exports.loop = function() {
         }
     }
 
-    // Call loop for every room and every creep
+    // Call loop for rooms
     for (let roomName in Game.rooms) {
         roomManager.loop(Game.rooms[roomName]);
     }
+    // Call loop for creeps
     for (let creepName in Game.creeps) {
         creepManager.loop(Game.creeps[creepName]);
     }
+    // Call loop for structures
+    // for (let structureID in Game.structures) {
+    //     let structure = Game.structures[structureID];
+    //     if (structure.owner.username != "NoraQ") {
+    //         continue;
+    //     }
+    //     switch (structure.structureType) {
+    //         case STRUCTURE_TOWER:
+    //             towerManager.loop(structure);
+    //             break;
+    //     }
+    // }
 }
