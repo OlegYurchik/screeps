@@ -12,8 +12,7 @@ const creepManager = {
         if (!creep.memory.initialized) {
             creep.memory.initialized = true;
             creep.memory.role = roleName ? roleName : creepRoles.default.name;
-            creep.memory.roleData = {};
-            creepRoles[creep.memory.role].init(creep, roleData);
+            creep.memory.roleData = roleData ? roleData : {};
         }
     },
 

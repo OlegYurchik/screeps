@@ -1,15 +1,15 @@
 /*
-* Creep Role Harvester *
+* Creep Role Scavenger *
 * resourceType: string
 */ 
 
 const creepRoleUtils = require("creep.role.utils");
 const creepRoleWorker = require("creep.role.worker");
 
-let creepRoleHarvester = {
+let creepRoleScavenger = {
     __proto__: creepRoleWorker,
 
-    name: "harvester",
+    name: "scavenger",
     pathColor: "#ffff00",
     defaultResourceType: RESOURCE_ENERGY, 
     // reusePath: 100,
@@ -19,24 +19,12 @@ let creepRoleHarvester = {
             creep.memory.roleData.resourceType = this.defaultResourceType;
         }
 
-        var source;
-        if (creep.memory.roleData.resourceType == RESOURCE_ENERGY) { 
-            source = creep.pos.findClosestByPath(FIND_SOURCES, {filter: function(source) {
-                return source.energy > 0;
-            }});
-        } else {
-            source = creep.pos.findClosestByPath(FIND_MINERALS, {filter: function(mineral) {
-                return mineral.mineralAmount > 0;
-            }});
-        }
-        if (!source) {
-            source = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {
-                filter: function(resource) {
-                    return resource.resourceType == creep.memory.roleData.resourceType &&
-                        resource.amount > 0;
-                },
-            });
-        }
+        var source = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {
+            filter: function(resource) {
+                return resource.resourceType == creep.memory.roleData.resourceType &&
+                    resource.amount > 0;
+            },
+        });
         if (!source) {
             var source = creep.pos.findClosestByPath(FIND_TOMBSTONES, {
                 filter: function(tombstone) {
@@ -105,8 +93,6 @@ let creepRoleHarvester = {
         } else if (creep.memory.roleData.state == this.stateHarvest) {
             if (source instanceof Resource) {
                 creepRoleUtils.doPickup(creep, source, this.pathColor, this.reusePath);
-            } else if (source instanceof Source || source instanceof Mineral) {
-                creepRoleUtils.doHarvest(creep, source, this.pathColor, this.reusePath);
             } else if (source instanceof Tombstone) {
                 creepRoleUtils.doWithdraw(creep, source, creep.memory.roleData.resourceType,
                                           this.pathColor, this.reusePath);
@@ -118,4 +104,4 @@ let creepRoleHarvester = {
     },
 };
 
-module.exports = creepRoleHarvester;
+module.exports = creepRoleScavenger;

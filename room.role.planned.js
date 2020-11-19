@@ -16,7 +16,7 @@ function bodyIsEqual(body, newItems) {
         return false;
     }
     for (let index = 0; index < body.length; index++) {
-        if (body[index].type != newItems[index]) {
+        if (body[index] != newItems[index]) {
             return false;
         }
     }
@@ -71,11 +71,15 @@ const roomRolePlanned = {
     getCreepsByHash(room) {
         var creeps = {};
         for (let creep of room.find(FIND_MY_CREEPS)) {
-            let hash = creepRoleUtils.getCreepHash(creep.memory.role, creep.body);
+            let body = [];
+            for (let bodyItem of creep.body) {
+                body.push(bodyItem.type);
+            }
+            let hash = creepRoleUtils.getCreepHash(creep.memory.role, body.sort());
             if (!(hash in creeps)) {
                 creeps[hash] = {
                     role: creep.memory.role,
-                    body: creep.body.sort(),
+                    body: body,
                     creepsNames: [],
                 };
             }
@@ -99,8 +103,15 @@ const roomRolePlanned = {
                 current = 0;
             }
             if (current != room.memory.roleData.targetState.creepsByHash[hash].count) {
+                let roleData;
+                if (room.memory.roleData.targetState.creepsByHash[hash].roleData) {
+                    roleData = room.memory.roleData.targetState.creepsByHash[hash].roleData;
+                } else {
+                    roleData = {};
+                }
                 creepsByHashDifference[hash] = {
                     role: room.memory.roleData.targetState.creepsByHash[hash].role,
+                    roleData: roleData,
                     body: room.memory.roleData.targetState.creepsByHash[hash].body,
                     count: room.memory.roleData.targetState.creepsByHash[hash].count - current,
                 };
@@ -114,6 +125,7 @@ const roomRolePlanned = {
             if (current) {
                 creepsByHashDifference[hash] = {
                     role: room.memory.roleData.state.creepsByHash[hash].role,
+                    roleData: {},
                     body: room.memory.roleData.state.creepsByHash[hash].body,
                     count: -current,
                 };
@@ -144,6 +156,7 @@ const roomRolePlanned = {
                                     hash: hash2,
                                     originalRole: creepsByHashDifference[hash1].role,
                                     role: creepsByHashDifference[hash2].role,
+                                    roleData: creepsByHashDifference[hash2].roleData,
                                 },
                             });
                         }
@@ -172,6 +185,7 @@ const roomRolePlanned = {
                         data: {
                             hash: hash,
                             role: creepsByHashDifference[hash].role,
+                            roleData: creepsByHashDifference[hash].roleData,
                             body: creepsByHashDifference[hash].body,
                         },
                     });
@@ -206,10 +220,8 @@ const roomRolePlanned = {
     setTargetState: function(room, targetState) {
         var creepsByHash = {};
         for (let state of targetState) {
-            let hash = creepRoleUtils.getCreepHash(state.role, state.body);
-            if (!(hash in creepsByHash)) {
-                creepsByHash[hash] = state;
-            }
+            let hash = creepRoleUtils.getCreepHash(state.role, state.body.sort());
+            creepsByHash[hash] = state;
         }
         room.memory.roleData.targetState = {
             creepsByHash: creepsByHash,

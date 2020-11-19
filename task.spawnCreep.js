@@ -37,7 +37,7 @@ const spawnCreepTask = {
                     room.memory.roleData.state.creepsByHash[task.data.hash].creepsNames.push(
                         creepName,
                     );
-                    creepManager.init(Game.creeps[creepName], task.data.role);
+                    creepManager.init(Game.creeps[creepName], task.data.role, task.data.roleData);
                     return created;
                 }
                 break;

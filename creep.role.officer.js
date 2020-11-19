@@ -2,12 +2,8 @@
 * Creep Role Officer [Abstract] *
 */
 
-const CreepRoleOfficer = {
+const creepRoleOfficer = {
     name: "officer",
-    
-    init(creep, roleData) {
-
-    },
 
     loop(creep) {
         var target = this.chooseTarget(creep);
@@ -18,4 +14,4 @@ const CreepRoleOfficer = {
     do(creep, target) {throw "Not implemented"},
 };
 
-module.exports = CreepRoleOfficer;
+module.exports = creepRoleOfficer;

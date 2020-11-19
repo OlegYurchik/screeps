@@ -6,6 +6,9 @@ const changeCreepRoleTask = {
             room.memory.roleData.state.creepsByHash[task.data.originalHash].creepsNames.pop();
         var creep = Game.creeps[creepName];
         creep.memory.role = task.data.role;
+        for (let name in task.data.roleData) {
+            creep.memory.roleData[name] = task.data.roleData[name];
+        }
         if (!(task.data.hash in room.memory.roleData.state.creepsByHash)) {
             room.memory.roleData.state.creepsByHash[task.data.hash] = {
                 role: task.data.role,

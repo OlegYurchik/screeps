@@ -19,10 +19,6 @@ const creepRoleWorker = {
     states: [stateRest, stateHarvest, stateAction],
     defaultState: stateRest,
 
-    init(creep, roleData) {
-
-    },
-
     loop(creep) {
         var source, target, pathToSource, pathToTarget;
 

@@ -10,24 +10,25 @@ module.exports.loop = function() {
         }
     }
 
-    // Call loop for rooms
+    // Call loop for rooms and towers
     for (let roomName in Game.rooms) {
         roomManager.loop(Game.rooms[roomName]);
+        let towers = Game.rooms[roomName].find(FIND_STRUCTURES, {
+            filter: function(structure) {
+                return structure.structureType == STRUCTURE_TOWER &&
+                    structure.owner.username == "NoraQ";
+        }});
+        for (let tower of towers) {
+            towerManager.loop(tower);
+        }
     }
     // Call loop for creeps
     for (let creepName in Game.creeps) {
         creepManager.loop(Game.creeps[creepName]);
     }
-    // Call loop for structures
-    // for (let structureID in Game.structures) {
-    //     let structure = Game.structures[structureID];
-    //     if (structure.owner.username != "NoraQ") {
-    //         continue;
-    //     }
-    //     switch (structure.structureType) {
-    //         case STRUCTURE_TOWER:
-    //             towerManager.loop(structure);
-    //             break;
-    //     }
-    // }
+
+    // Generate pixel
+    if (Game.cpu.bucket > 5000) {
+        Game.cpu.generatePixel();
+    }
 }

@@ -1,15 +1,15 @@
 /*
-* Creep Role Upgrader *
+* Creep Role Builder *
 */
 
 const creepRoleUtils = require("creep.role.utils");
 const creepRoleWorker = require("creep.role.worker");
 
-const creepRoleUpgrader = {
+const creepRoleFixer = {
     __proto__: creepRoleWorker,
 
-    name: "upgrader",
-    pathColor: "#ffa500",
+    name: "fixer",
+    pathColor: "#42aaff",
     // reusePath: 100,
 
     chooseSource(creep) {
@@ -44,7 +44,19 @@ const creepRoleUpgrader = {
     },
 
     chooseTarget(creep) {
-        return creep.room.controller;
+        var target;
+        var structures = creep.room.find(FIND_STRUCTURES, {filter: function(structure) {
+            return structure.hits < structure.hitsMax;
+        }})
+        if (structures.length > 0) {
+            target = structures[0];
+            for (let structure of structures) {
+                if (structure.hits < target.hits) {
+                    target = structure;
+                }
+            }
+        }
+        return target;
     },
 
     chooseState(creep, source, pathToSource, target, pathToTarget) {
@@ -67,7 +79,7 @@ const creepRoleUpgrader = {
 
     do(creep, source, pathToSource, target, pathToTarget) {
         if (creep.memory.roleData.state == this.stateAction) {
-            creepRoleUtils.doUpgrade(creep, this.pathColor, this.reusePath);
+            creepRoleUtils.doFix(creep, target, this.pathColor, this.reusePath);
         } else if (creep.memory.roleData.state == this.stateHarvest) {
             if (source instanceof Resource) {
                 creepRoleUtils.doPickup(creep, source, this.pathColor, this.reusePath);
@@ -84,4 +96,4 @@ const creepRoleUpgrader = {
     },
 };
 
-module.exports = creepRoleUpgrader;
+module.exports = creepRoleFixer;

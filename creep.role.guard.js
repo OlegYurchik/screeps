@@ -3,11 +3,11 @@
 * dutyPoint: array of 2 integer
 */
 
-const CreepRoleOfficer = require("creep.role.officer");
+const creepRoleOfficer = require("creep.role.officer");
 const creepRoleUtils = require("creep.role.utils");
 
-const CreepRoleGuard = {
-    __proto__: CreepRoleOfficer,
+const creepRoleGuard = {
+    __proto__: creepRoleOfficer,
 
     name: "guard",
     pathColor: "#ff0000",
@@ -30,4 +30,4 @@ const CreepRoleGuard = {
     },
 };
 
-module.exports = CreepRoleGuard;
+module.exports = creepRoleGuard;

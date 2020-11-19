@@ -1,5 +1,8 @@
 function doAttack(creep, target, pathColor, reusePath) {
     var result = creep.attack(target);
+    if (result != OK) {
+        result = creep.rangedAttack(target);
+    }
     if (result == ERR_NOT_IN_RANGE) {
         creep.say("👊");
         creep.moveTo(target, {
@@ -106,7 +109,7 @@ function doWithdraw(creep, target, resourceType, pathColor, reusePath) {
 }
 
 function getCreepHash(roleName, body) {
-    var string = roleName + body.sort().join("");
+    var string = roleName + body.join("");
     var hash = 0;
     for (let i = 0; i < string.length; i++) {
         let character = string.charCodeAt(i);
