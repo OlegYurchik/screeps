@@ -1,13 +1,13 @@
 /*
-* Creep Role Upgrader *
-*/
+* Creep Role Сourier *
+*/ 
 
 const creepRoleWorker = require("creep.role.worker");
 
-const creepRoleUpgrader = {
+let creepRoleCourier = {
     __proto__: creepRoleWorker,
 
-    name: "upgrader",
+    name: "courier",
 
     chooseResource(creep) {
         var source = this.chooseStorage(creep, RESOURCE_ENERGY);
@@ -24,25 +24,39 @@ const creepRoleUpgrader = {
     },
 
     chooseTarget(creep) {
-        return creep.room.controller;
+        var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+            filter: function(structure) {
+                return (structure.structureType == STRUCTURE_SPAWN ||
+                    structure.structureType == STRUCTURE_EXTENSION) &&
+                    structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;     
+            },
+        });
+        if (!target) {
+            target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                filter: function(structure) {
+                    return structure.structureType == STRUCTURE_TOWER &&
+                        structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;     
+                },
+            });
+        }
+        return target;
     },
 
     chooseState(creep, source, pathToSource, target, pathToTarget) {
         if (creep.memory.roleData.forceRest || (creep.memory.roleData.state != this.stateRest &&
-                (!source || creep.store.getFreeCapacity(RESOURCE_ENERGY) == 0)) &&
-                (!target || creep.store[RESOURCE_ENERGY] == 0)) {
+                (!source || creep.store.getFreeCapacity(RESOURCE_ENERGY) == 0) &&
+                (!target || target.store.getFreeCapacity(RESOURCE_ENERGY) == 0 ||
+                creep.store[RESOURCE_ENERGY] == 0))) {
            creep.memory.roleData.state = this.stateRest;
         } else if (creep.memory.roleData.state != this.stateHarvest &&
-                       creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0 && !!source &&
-                       (creep.store[RESOURCE_ENERGY] == 0 ||
-                       (!!pathToTarget && pathToSource.length <= pathToTarget.length - 3) ||
-                       !target)) {
+                       creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0 &&
+                       !!source && (creep.store[RESOURCE_ENERGY] == 0 ||
+                       (!!pathToTarget && pathToSource.length <= pathToTarget.length) || !target)) {
             creep.memory.roleData.state = this.stateHarvest;
         } else if (creep.memory.roleData.state != this.stateAction &&
                        creep.store[RESOURCE_ENERGY] > 0 && !!target &&
                        (creep.store.getFreeCapacity(RESOURCE_ENERGY) == 0 ||
-                       (!!pathToSource && pathToTarget.length - 3 <= pathToSource.length) ||
-                       !source)) {
+                       (!!pathToSource && pathToTarget.length <= pathToSource.length) || !source)) {
             creep.memory.roleData.state = this.stateAction;
         }
     },
@@ -57,18 +71,18 @@ const creepRoleUpgrader = {
             case this.stateHarvest:
                 if (source instanceof Resource) {
                     this.doPickup(creep, source, pathToSource);
-                } else if (source instanceof Source) {
+                } else if (source instanceof Source || source instanceof Mineral) {
                     this.doHarvest(creep, source, pathToSource);
                 } else if (source instanceof Tombstone || source instanceof Structure ||
                         source instanceof Ruin) {
-                    this.doWithdraw(creep, source, RESOURCE_ENERGY, pathToTarget);
+                    this.doWithdraw(creep, source, RESOURCE_ENERGY, pathToSource);
                 }
                 break;
             case this.stateAction:
-                this.doUpgrade(creep, pathToTarget);
+                this.doTransfer(creep, target, RESOURCE_ENERGY, pathToTarget);
                 break;
         }
     },
 };
 
-module.exports = creepRoleUpgrader;
+module.exports = creepRoleCourier;

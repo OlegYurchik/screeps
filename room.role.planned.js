@@ -8,15 +8,15 @@
 */
 
 const creepRoles = require("creep.roles");
-const creepRoleUtils = require("creep.role.utils");
+const roomRoleCommon = require("room.role.common");
 const taskTypes = require("tasks");
 
-function bodyIsEqual(body, newItems) {
-    if (body.length != newItems.length) {
+function arraysIsEqual(array1, array2) {
+    if (array1.length != array2.length) {
         return false;
     }
-    for (let index = 0; index < body.length; index++) {
-        if (body[index] != newItems[index]) {
+    for (let index = 0; index < array1.length; index++) {
+        if (array2[index] != array1[index]) {
             return false;
         }
     }
@@ -24,15 +24,23 @@ function bodyIsEqual(body, newItems) {
 }
 
 const roomRolePlanned = {
+    __proto__: roomRoleCommon,
+
     name: "planned",
     eventHandlers: {
         [EVENT_OBJECT_DESTROYED]: "objectDestroyedHandler",
     },
+    ticksToLiveRenew: 100,
     creepRolePriority: {
-        [creepRoles.harvester.name]: 4,
-        [creepRoles.guard.name]: 3,
-        [creepRoles.upgrader.name]: 2,
-        [creepRoles.builder.name]: 1,
+        [creepRoles.courier.name]: 9,
+        [creepRoles.harvester.name]: 8,
+        [creepRoles.guard.name]: 7,
+        [creepRoles.scavenger.name]: 6,
+        [creepRoles.fixer.name]: 5,
+        [creepRoles.builder.name]: 4,
+        [creepRoles.upgrader.name]: 3,
+        [creepRoles.reserver.name]: 2,
+        [creepRoles.claimer.name]: 1,
     },
 
     init(room, roleData) {
@@ -40,27 +48,29 @@ const roomRolePlanned = {
     },
 
     loop(room) {
-        if (room.memory.roleData.state === undefined) {
+        if (!room.memory.roleData.state) {
             room.memory.roleData.state = {
-                creepsByHash: this.getCreepsByHash(room),
+                creepsByHash: this.getCreepsState(room),
             };
         }
-        if (room.memory.roleData.targetState === undefined) {
+        if (!room.memory.roleData.targetState) {
             room.memory.roleData.targetState = {};
         }
 
-        if (room.memory.roleData.tasks === undefined) {
+        if (!room.memory.roleData.tasks) {
             room.memory.roleData.tasks = [];
         }
+
+        // Do tasks
         if (room.memory.roleData.tasks.length > 0) {
             let task = room.memory.roleData.tasks[0];
-            if (taskTypes[task.action].action(task, room)) {
+            if (this.doTask(room, task)) {
                 room.memory.roleData.tasks.shift();
             }
         }
 
         var events = room.getEventLog(false);
-        
+
         for (let event of events) {
             if (event.event in this.eventHandlers) {
                 this[this.eventHandlers[event.event]](room, event);
@@ -68,24 +78,38 @@ const roomRolePlanned = {
         }
     },
 
-    getCreepsByHash(room) {
-        var creeps = {};
-        for (let creep of room.find(FIND_MY_CREEPS)) {
+    getCreepHash(roleName, body) {
+        var string = roleName + body.join("");
+        var hash = 0;
+        for (let i = 0; i < string.length; i++) {
+            let character = string.charCodeAt(i);
+            hash = ((hash<<5)-hash)+character;
+            hash = hash & hash;
+        }
+        return hash.toString();
+    },
+
+    getCreepsState(room) {
+        var creeps = room.find(FIND_MY_CREEPS, {filter: function(creep) {
+            return creep.memory.roomData.planned == room.name;
+        }})
+        var state = {};
+        for (let creep of creeps) {
             let body = [];
             for (let bodyItem of creep.body) {
                 body.push(bodyItem.type);
             }
-            let hash = creepRoleUtils.getCreepHash(creep.memory.role, body.sort());
-            if (!(hash in creeps)) {
-                creeps[hash] = {
+            let hash = this.getCreepHash(creep.memory.role, body.sort());
+            if (!(hash in state)) {
+                state[hash] = {
                     role: creep.memory.role,
                     body: body,
                     creepsNames: [],
                 };
             }
-            creeps[hash].creepsNames.push(creep.name);
+            state[hash].creepsNames.push(creep.name);
         }
-        return creeps;
+        return state;
     },
 
     calculateCreepTasks(room) {
@@ -140,7 +164,7 @@ const roomRolePlanned = {
             if (creepsByHashDifference[hash1].count < 0) {
                 for (let hash2 in creepsByHashDifference) {
                     if (creepsByHashDifference[hash2].count > 0 &&
-                        bodyIsEqual(
+                        arraysIsEqual(
                             creepsByHashDifference[hash1].body.sort(),
                             creepsByHashDifference[hash2].body.sort(),
                         )) {
@@ -186,6 +210,7 @@ const roomRolePlanned = {
                             hash: hash,
                             role: creepsByHashDifference[hash].role,
                             roleData: creepsByHashDifference[hash].roleData,
+                            roomData: {planned: room.name},
                             body: creepsByHashDifference[hash].body,
                         },
                     });
@@ -217,10 +242,10 @@ const roomRolePlanned = {
         return changeCreepRoleTasks.concat(spawnCreepTasks).concat(killCreepTasks);
     },
 
-    setTargetState: function(room, targetState) {
+    setTargetState(room, targetState) {
         var creepsByHash = {};
         for (let state of targetState) {
-            let hash = creepRoleUtils.getCreepHash(state.role, state.body.sort());
+            let hash = this.getCreepHash(state.role, state.body.sort());
             creepsByHash[hash] = state;
         }
         room.memory.roleData.targetState = {
@@ -229,10 +254,14 @@ const roomRolePlanned = {
         room.memory.roleData.tasks = this.calculateCreepTasks(room);
     },
 
+    doTask(room, task) {
+        return taskTypes[task.action].action(task, room);
+    },
+
     // Event handlers
-    objectDestroyedHandler: function(room, event) {
-        if (event.data.type == "creep") {
-            room.memory.roleData.state.creepsByHash = this.getCreepsByHash(room);
+    objectDestroyedHandler(room, event) {
+        if (event.data.type == LOOK_CREEPS) {
+            room.memory.roleData.state.creepsByHash = this.getCreepsState(room);
             room.memory.roleData.tasks = this.calculateCreepTasks(room);
         }
     },

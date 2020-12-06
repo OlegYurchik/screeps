@@ -7,11 +7,15 @@
 * forceRest: bool
 */
 
+const creepRoleCommon = require("creep.role.common");
+
 const stateRest = 0;
 const stateHarvest = 1;
 const stateAction = 2;
 
 const creepRoleWorker = {
+    __proto__: creepRoleCommon,
+
     name: "worker",
     stateRest: stateRest,
     stateHarvest: stateHarvest,
@@ -22,12 +26,12 @@ const creepRoleWorker = {
     loop(creep) {
         var source, target, pathToSource, pathToTarget;
 
-        // Get source and target
+        // Get source
         if (creep.memory.roleData.forceSourceID) {
             source = Game.getObjectById(creep.memory.roleData.forceSourceID);
         }
         if (!source) {
-            source = this.chooseSource(creep);
+            source = this.chooseResource(creep);
         }
         if (creep.memory.roleData.forceTargetID) {
             target = Game.getObjectById(creep.memory.roleData.forceTargetID);
@@ -38,10 +42,10 @@ const creepRoleWorker = {
 
         // Calculate paths to source and target
         if (source) {
-            pathToSource = creep.room.findPath(creep.pos, source.pos, {ignoreCreeps: true});
+            pathToSource = creep.room.findPath(creep.pos, source.pos);
         }
         if (target) {
-            pathToTarget = creep.room.findPath(creep.pos, target.pos, {ignoreCreeps: true});
+            pathToTarget = creep.room.findPath(creep.pos, target.pos);
         }
 
         // Set default state if state is undefined
@@ -111,7 +115,7 @@ const creepRoleWorker = {
         return true;
     },
 
-    chooseSource(creep) {throw "Not implemented"},
+    chooseResource(creep) {throw "Not implemented"},
     chooseTarget(creep) {throw "Not implemented"},
     chooseState(creep, source, pathToSource, target, pathToTarget) {throw "Not implemented"},
     do(creep, source, pathToSource, target, pathToTarget) {throw "Not implemented"},

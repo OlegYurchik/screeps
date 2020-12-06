@@ -2,7 +2,11 @@
 * Creep Role Officer [Abstract] *
 */
 
+const creepRoleCommon = require("creep.role.common");
+
 const creepRoleOfficer = {
+    __proto__: creepRoleCommon,
+
     name: "officer",
 
     loop(creep) {

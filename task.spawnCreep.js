@@ -19,30 +19,37 @@ const spawnCreepTask = {
         for (let spawn of spawns) {
             while (true) {
                 let creepName = this.getRandomString(8);
-                let result = spawn.spawnCreep(task.data.body, creepName, {
-                    memory: {role: task.data.role},
-                });
+                let result = spawn.spawnCreep(task.data.body, creepName);
                 if (result == ERR_NAME_EXISTS) {
                     continue;
                 }
                 if (result == OK) {
                     created = true;
-                    if (!(task.data.hash in room.memory.roleData.state.creepsByHash)) {
-                        room.memory.roleData.state.creepsByHash[task.data.hash] = {
-                            role: task.data.role,
-                            body: task.data.body,
-                            creepsNames: [],
-                        };
+                    if (task.data.roomData && task.data.roomData.planned) {
+                        if (!(task.data.hash in room.memory.roleData.state.creepsByHash)) {
+                            room.memory.roleData.state.creepsByHash[task.data.hash] = {
+                                role: task.data.role,
+                                body: task.data.body,
+                                creepsNames: [],
+                            };
+                        }
+                        room.memory.roleData.state.creepsByHash[task.data.hash].creepsNames.push(
+                            creepName,
+                        );
                     }
-                    room.memory.roleData.state.creepsByHash[task.data.hash].creepsNames.push(
-                        creepName,
+
+                    creepManager.init(
+                        Game.creeps[creepName],
+                        task.data.role,
+                        task.data.roleData,
+                        task.data.roomData,
                     );
-                    creepManager.init(Game.creeps[creepName], task.data.role, task.data.roleData);
                     return created;
                 }
                 break;
             }
         }
+        return created;
     }
 };
 

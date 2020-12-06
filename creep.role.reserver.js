@@ -1,14 +1,14 @@
 /*
-* Creep Role Claimer
+* Creep Role Reserver
 * roomName: string
 */
 
 const creepRoleOfficer = require("creep.role.officer");
 
-const creepRoleClaimer = {
+const creepRoleReserver = {
     __proto__: creepRoleOfficer,
 
-    name: "claimer",
+    name: "reserver",
 
     chooseTarget(creep) {
         if (creep.memory.roleData.roomName == creep.room.name) {
@@ -27,11 +27,11 @@ const creepRoleClaimer = {
 
     do(creep, target) {
         if (target instanceof StructureController) {
-            this.doClaim(creep, target);
+            this.doReserve(creep, target);
         } else {
             this.doMove(creep, target);
         }
     },
 };
 
-module.exports = creepRoleClaimer;
+module.exports = creepRoleReserver;
